@@ -1,0 +1,6 @@
+*.wav
+*temp*
+*vscode
+*dataset
+*pycache*
+*outputs
