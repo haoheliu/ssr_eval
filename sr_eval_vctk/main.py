@@ -14,7 +14,8 @@ test
     ...
 """
 
-TEST_ROOT = "/Users/liuhaohe/projects/sr_eval_vctk/dataset/wav48/test"
+# TEST_ROOT = "/Users/liuhaohe/projects/sr_eval_vctk/dataset/wav48/test"
+TEST_ROOT = "/blob/v-haoheliu/datasets/vctk_test"
 SAMPLE_RATE=44100
 audio_metrics = AudioMetrics(SAMPLE_RATE)
 
@@ -70,5 +71,5 @@ def main(test_name = "test", test_run=False):
     return final_result
 
 if __name__ == "__main__":
-    main(test_run=False)
+    main(test_run=True)
             

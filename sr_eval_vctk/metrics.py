@@ -77,10 +77,13 @@ class AudioMetrics():
         result = {}        
         # frequency domain
         # import time; start = time.time()
-        result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
-        result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
-        result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
-        result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
+        try:
+            result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
+            result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
+            result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
+            result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
+        except Exception as e:
+            print("Exception: ", est_sp.size(), target_sp.size())
         # print(time.time()-start)
 
         for key in result: result[key] = float(result[key])

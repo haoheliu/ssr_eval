@@ -44,12 +44,12 @@ def mp3_encoding(file, x, sr):
             os.system(cmd2)
             os.system(cmd3)
             ret_dict[key], _ = librosa.load(target_file, sr=sr)
-            if(ret_dict[key].shape[0] > x.shape[0]):
-                diff = (ret_dict[key].shape[0]-x.shape[0])//2
-                diff2 = ret_dict[key].shape[0]-x.shape[0]-diff
-                ret_dict[key] = ret_dict[key][diff: ret_dict[key].shape[0] - diff2] # trim the first few ms
-            assert ret_dict[key].shape == x.shape, str((ret_dict[key].shape, x.shape))
-            sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
+            # if(ret_dict[key].shape[0] > x.shape[0]):
+            #     diff = (ret_dict[key].shape[0]-x.shape[0])//2
+            #     diff2 = ret_dict[key].shape[0]-x.shape[0]-diff
+            #     ret_dict[key] = ret_dict[key][diff: ret_dict[key].shape[0] - diff2] # trim the first few ms
+            # assert ret_dict[key].shape == x.shape, str((ret_dict[key].shape, x.shape))
+            # sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
     return ret_dict
 
 def cache_file_name(key, file, suffix=".flac"):
