@@ -84,6 +84,10 @@ class AudioMetrics():
             result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
         except Exception as e:
             print("Exception: ", est_sp.size(), target_sp.size())
+            result["lsd"] = 0
+            result["log_sispec"] = 0
+            result["sispec"] = 0
+            result["ssim"] = 0
         # print(time.time()-start)
 
         for key in result: result[key] = float(result[key])
