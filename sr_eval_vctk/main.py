@@ -70,5 +70,5 @@ def main(test_name = "test", test_run=False):
     return final_result
 
 if __name__ == "__main__":
-    main(test_run=True)
+    main(test_run=False)
             
