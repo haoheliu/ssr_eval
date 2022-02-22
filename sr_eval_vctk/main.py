@@ -33,6 +33,19 @@ def evaluate(file):
         metrics[k] = audio_metrics.evaluation(original, processed, file)
     return metrics
 
+def get_test_file_list(path):
+    ret = []
+    for file in os.listdir(path):
+        if(file[-4:]!=".wav" and file[-5:]!=".flac"): # Other files
+            continue
+        elif("DS_Store" in file): # MacOS files
+            continue
+        elif("proc" in file): # Cache files
+            continue
+        else: 
+            ret.append(file)
+    return ret 
+
 def main(test_name = "test", test_run=False):
     from tqdm import tqdm
     from datetime import datetime
@@ -42,15 +55,9 @@ def main(test_name = "test", test_run=False):
             continue
         print("Speaker:", speaker)
         final_result[speaker] = {}
-        for i, file in enumerate(tqdm(os.listdir(os.path.join(TEST_ROOT, speaker)))):
-            if(file[-4:]!=".wav" and file[-5:]!=".flac"): # Other files
-                continue
-            if("DS_Store" in file): # MacOS files
-                continue
-            if("proc" in file): # Cache files
-                continue
+        for i, file in enumerate(tqdm(get_test_file_list(os.path.join(TEST_ROOT, speaker)))):
             if(test_run): 
-                if(i > 4): break
+                if(i > 20): break
             audio_path = os.path.join(TEST_ROOT, speaker, file)
             final_result[speaker][file] = evaluate(audio_path)
     os.makedirs("outputs", exist_ok=True)

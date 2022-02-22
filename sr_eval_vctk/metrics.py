@@ -74,7 +74,6 @@ class AudioMetrics():
             torch.save(target_sp, target_spec_path)
         
         est_sp = self.wav_to_spectrogram(est_wav)
-        # print(time.time()-start)
         result = {}        
         # frequency domain
         
