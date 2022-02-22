@@ -46,7 +46,7 @@ class AudioMetrics():
         f = torch.tensor(f[None,None,...])
         return f
 
-    def evaluation(self, est, target):
+    def evaluation(self, est, target, file):
         """evaluate between two audio
 
         Args:
@@ -66,16 +66,23 @@ class AudioMetrics():
             assert len(list(est.shape)) == 1 and len(list(target.shape)) == 1, "The input numpy array shape should be [samples,]. Got input shape %s and %s. " % (est.shape, target.shape)
             est_wav, target_wav = est, target
             
-        est_sp = self.wav_to_spectrogram(est_wav)
-        target_sp = self.wav_to_spectrogram(target_wav)
-
-        result = {}
+        target_spec_path = os.path.join(os.path.dirname(file), os.path.splitext(os.path.basename(file))[0]+".pt")    
+        if(os.path.exists(target_spec_path)):
+            target_sp = torch.load(target_spec_path)    
+        else:
+            target_sp = self.wav_to_spectrogram(target_wav)
+            torch.save(target_sp, target_spec_path)
         
+        est_sp = self.wav_to_spectrogram(est_wav)
+
+        result = {}        
         # frequency domain
+        # import time; start = time.time()
         result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
         result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
         result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
         result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
+        # print(time.time()-start)
 
         for key in result: result[key] = float(result[key])
         return result

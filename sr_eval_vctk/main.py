@@ -5,6 +5,7 @@ import os
 from metrics import AudioMetrics
 from handler import * 
 from utils import * 
+from preprocess import preprocess
 
 """_summary_
 test
@@ -12,6 +13,7 @@ test
     -p361
     ...
 """
+
 TEST_ROOT = "/Users/liuhaohe/projects/sr_eval_vctk/dataset/wav48/test"
 SAMPLE_RATE=44100
 audio_metrics = AudioMetrics(SAMPLE_RATE)
@@ -22,18 +24,13 @@ def dict_mean(dict_list):
         ret_val[k] = np.mean([v[k] for v in dict_list])
     return ret_val
 
-def preprocess(file):
-    # Add various effect on the samples
-    x, sr = librosa.load(file, sr=SAMPLE_RATE)
-    return {"original":x, "half":x/2}
-
 def evaluate(file):
     metrics = {}
-    processed_low_res_input = preprocess(file)
+    processed_low_res_input = preprocess(file, sr=SAMPLE_RATE)
     for k in processed_low_res_input.keys():
         original, processed = handler_same(processed_low_res_input[k])
         # processed_low_res_input[k] = (processed_low_res_input[k], processed)
-        metrics[k] = audio_metrics.evaluation(original, processed)
+        metrics[k] = audio_metrics.evaluation(original, processed, file)
     return metrics
 
 def main(test_name = "test", test_run=False):
@@ -44,8 +41,14 @@ def main(test_name = "test", test_run=False):
         print("Speaker:", speaker)
         final_result[speaker] = {}
         for i, file in enumerate(tqdm(os.listdir(os.path.join(TEST_ROOT, speaker)))):
+            if(file[-4:]!=".wav" and file[-5:]!=".flac"): # Other files
+                continue
+            if("DS_Store" in file): # MacOS files
+                continue
+            if("proc" in file): # Cache files
+                continue
             if(test_run): 
-                if(i > 4): break
+                if(i > 10): break
             audio_path = os.path.join(TEST_ROOT, speaker, file)
             final_result[speaker][file] = evaluate(audio_path)
     os.makedirs("outputs", exist_ok=True)
@@ -67,5 +70,5 @@ def main(test_name = "test", test_run=False):
     return final_result
 
 if __name__ == "__main__":
-    main(test_run=True)
+    main(test_run=False)
             

@@ -35,7 +35,6 @@ def convert_wav_to_flac(dir):
         pbar.update(int((i / (len(files) - 1)) * 100))
     pbar.finish()
 
-
 def get_framesLength(fname):
     with wave.open(fname) as f:
         params = f.getparams()
