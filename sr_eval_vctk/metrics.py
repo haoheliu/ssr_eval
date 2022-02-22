@@ -98,25 +98,18 @@ class AudioMetrics():
         
         result = {}        
         # frequency domain
-        try:
-            result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
-            result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
-            result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
-            result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
-        except Exception as e:
-            print("Exception: ", e, est_sp.size(), target_sp.size())
-            result["lsd"] = 0
-            result["log_sispec"] = 0
-            result["sispec"] = 0
-            result["ssim"] = 0
-        # print(time.time()-start)
+        
+        result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
+        result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
+        result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
+        result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
 
         for key in result: result[key] = float(result[key])
         return result
 
     def lsd(self,est, target):
         # lsd = torch.log10((target**2/(est**2 + EPS)) + EPS)**2
-        lsd = torch.log10((target**2/(est**2)))**2
+        lsd = torch.log10(target**2/((est+EPS) ** 2) + EPS)**2
         lsd = torch.mean(torch.mean(lsd,dim=3)**0.5,dim=2)
         return lsd[...,None,None]
 
@@ -141,5 +134,6 @@ class AudioMetrics():
 if __name__ == '__main__':
     import numpy as np
     au = AudioMetrics(rate=44100)
-    result = au.evaluation("/Users/liuhaohe/Downloads/output_1500000_pitch_mas/lj_LJ008-0121.wav","/Users/liuhaohe/Downloads/output_1500000_pitch_mas/lj_LJ008-0121.wav")
+    path = "/Users/liuhaohe/Downloads/output_1500000_pitch_mas/lj_LJ008-0121.wav"
+    result = au.evaluation(path,path,path)
     print(result)
