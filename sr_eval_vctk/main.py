@@ -30,7 +30,6 @@ def evaluate(file):
     processed_low_res_input = preprocess(file, sr=SAMPLE_RATE)
     for k in processed_low_res_input.keys():
         original, processed = handler_same(processed_low_res_input[k])
-        # processed_low_res_input[k] = (processed_low_res_input[k], processed)
         metrics[k] = audio_metrics.evaluation(original, processed, file)
     return metrics
 
