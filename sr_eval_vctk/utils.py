@@ -4,8 +4,8 @@ import json
 import os
 import glob
 from progressbar import *
-
-EPS=1e-8
+import numpy as np 
+EPS=1e-12
 
 import torch
 import time
@@ -56,7 +56,7 @@ def get_sample_rate(fname):
     return params[2]
 
 def to_log(input):
-    return torch.log10(torch.clip(input, min=1e-8))
+    return torch.log10(input + 1e-12)
 
 def from_log(input):
     input = torch.clip(input,min=-np.inf, max=5)
