@@ -38,6 +38,8 @@ def main(test_name = "test", test_run=False):
     from datetime import datetime
     final_result = {}
     for speaker in os.listdir(TEST_ROOT):
+        if("DS_Store" in speaker): # MacOS files
+            continue
         print("Speaker:", speaker)
         final_result[speaker] = {}
         for i, file in enumerate(tqdm(os.listdir(os.path.join(TEST_ROOT, speaker)))):
@@ -48,7 +50,7 @@ def main(test_name = "test", test_run=False):
             if("proc" in file): # Cache files
                 continue
             if(test_run): 
-                if(i > 10): break
+                if(i > 4): break
             audio_path = os.path.join(TEST_ROOT, speaker, file)
             final_result[speaker][file] = evaluate(audio_path)
     os.makedirs("outputs", exist_ok=True)

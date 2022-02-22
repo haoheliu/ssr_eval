@@ -58,6 +58,7 @@ class AudioMetrics():
         Returns:
             _type_: _description_
         """
+        # import time; start = time.time()
         if(type(est) != type(target)): raise ValueError("The input value should either both be numpy array or strings")
         if(type(est) == type("")):
             est_wav, target_wav = self.read(est, target)
@@ -73,10 +74,10 @@ class AudioMetrics():
             torch.save(target_sp, target_spec_path)
         
         est_sp = self.wav_to_spectrogram(est_wav)
-
+        # print(time.time()-start)
         result = {}        
         # frequency domain
-        # import time; start = time.time()
+        
         try:
             result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
             result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
