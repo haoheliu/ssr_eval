@@ -31,7 +31,7 @@ def preprocess(file, sr):
 def mp3_encoding(file, x, sr):
     ret_dict = {}
     for low_kbps in LOW_KBPS:
-        key = 'mp3_%s' % (low_kbps)
+        key = 'proc_mp3_%s' % (low_kbps)
         target_file = cache_file_name(key, file)
         target_mp3_file = cache_file_name(key, file, suffix=".mp3")
         if(os.path.exists(target_file)): 
