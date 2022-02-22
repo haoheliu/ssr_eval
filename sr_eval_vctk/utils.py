@@ -8,7 +8,6 @@ import numpy as np
 EPS=1e-12
 
 import torch
-import time
 from pynvml import *
 
 
@@ -41,9 +40,15 @@ def get_framesLength(fname):
     return params[3]
 
 def write_json(my_dict, fname):
-    json_str = json.dumps(my_dict)
+    json_str = json.dumps(my_dict, indent=4)
     with open(fname, 'w') as json_file:
         json_file.write(json_str)
+        
+def dict_mean(dict_list):
+    ret_val = {}
+    for k in dict_list[0].keys():
+        ret_val[k] = np.mean([v[k] for v in dict_list])
+    return ret_val
 
 def load_json(fname):
     with open(fname,'r') as f:

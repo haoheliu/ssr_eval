@@ -9,7 +9,6 @@ import librosa
 import torch
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
-from sr_eval_vctk.mel_scale import MelScale
 from sr_eval_vctk.utils import *
 
 EPS = 1e-12
@@ -31,7 +30,8 @@ class AudioMetrics():
             self.hop_length = 160
             self.n_fft = 743
         else:
-            raise ValueError("Bad Samplerate")
+            self.hop_length = 441
+            self.n_fft = 2048
         # self.metrics = sm.load(['sisdr','stoi','pesq','bsseval'], np.inf)
 
     def read(self, est, target):
@@ -44,6 +44,27 @@ class AudioMetrics():
         f = np.transpose(f,(1,0))
         f = torch.tensor(f[None,None,...])
         return f
+
+    def center_crop(self, x,y):
+        dim = 2
+        if(x.size(dim) == y.size(dim)): return x,y
+        elif(x.size(dim) > y.size(dim)):  
+            offset = x.size(dim)-y.size(dim)
+            start = offset // 2
+            end = offset-start
+            x = x[:,:,start:-end,:]
+            # x = x[:,:,offset:,:]
+            # x = x[:,:,:-offset,:]
+        elif(x.size(dim) < y.size(dim)):  
+            offset = y.size(dim)-x.size(dim)
+            start = offset // 2
+            end = offset-start
+            y = y[:,:,start:-end,:]  
+            # y = y[:,:,offset:,:]   
+            # y = y[:,:,:-offset,:]   
+        assert offset < 10, "Error: the offset %s is too large, check the code please" % (offset)
+        return x,y
+        
 
     def evaluation(self, est, target, file):
         """evaluate between two audio
@@ -65,7 +86,7 @@ class AudioMetrics():
         else:
             assert len(list(est.shape)) == 1 and len(list(target.shape)) == 1, "The input numpy array shape should be [samples,]. Got input shape %s and %s. " % (est.shape, target.shape)
             est_wav, target_wav = est, target
-            
+        
         target_spec_path = os.path.join(os.path.dirname(file), os.path.splitext(os.path.basename(file))[0]+"_proc.pt")    
         if(os.path.exists(target_spec_path)):
             target_sp = torch.load(target_spec_path)    
@@ -74,9 +95,9 @@ class AudioMetrics():
             torch.save(target_sp, target_spec_path)
         
         est_sp = self.wav_to_spectrogram(est_wav)
+        
         result = {}        
         # frequency domain
-        
         try:
             result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
             result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
