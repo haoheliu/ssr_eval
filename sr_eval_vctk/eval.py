@@ -12,6 +12,12 @@ class BasicTestee:
     def __init__(self) -> None:
         pass
     
+    def tensor2numpy(self, tensor):
+        if("cuda" in str(tensor.device)):
+            return tensor.detach().cpu().numpy()
+        else:
+            return tensor.detach().numpy()
+    
     @abstractmethod
     def infer(self, x, target):
         # x: [sample,]
@@ -66,6 +72,7 @@ class SR_Eval:
             processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
             metrics[k] = self.audio_metrics.evaluation(processed, target, file)
             metrics[k].update(addtional_metrics)
+            # sf.write(file+k+"temp_del.wav", processed, self.sr) # todo
         return metrics
 
     def get_test_file_list(self,path):
@@ -94,7 +101,7 @@ class SR_Eval:
             final_result[speaker] = {}
             for i, file in enumerate(tqdm(self.get_test_file_list(os.path.join(self.test_data_root, speaker)))):
                 if(limit_test_nums > 0): 
-                    if(i > limit_test_nums): break
+                    if(i >= limit_test_nums): break
                 audio_path = os.path.join(self.test_data_root, speaker, file)
                 final_result[speaker][file] = self.evaluate_single(audio_path)
         
@@ -126,6 +133,7 @@ class SR_Eval:
         Returns:
             _type_: dict
         """
+        
         ret_dict={}
         x, _ = librosa.load(file, sr=sr)
         if(self.setting_lowpass_filtering is not None and "butter" in self.setting_lowpass_filtering['filter']):
@@ -174,7 +182,7 @@ class SR_Eval:
     def mp3_encoding(self, file, x, sr):
         ret_dict = {}
         for low_kbps in self.setting_mp3_compression['original_low_kbps']:
-            key = 'proc_mp3_%s' % (low_kbps)
+            key = 'proc_mp3_%s_%s' % (low_kbps, sr)
             temp_file = self.cache_file_name("temp", file)
             target_file = self.cache_file_name(key, file)
             target_mp3_file = self.cache_file_name(key, file, suffix=".mp3")
@@ -194,7 +202,7 @@ class SR_Eval:
                 shifted = self.shift(ret_dict[key], shft01)
                 sf.write(target_file, shifted[...,None], samplerate=sr)
                 ret_dict[key] = shifted
-            assert ret_dict[key].shape == x.shape
+            assert ret_dict[key].shape == x.shape, str((ret_dict[key].shape, x.shape))
             assert np.sum(ret_dict[key]-x) != 0.0
         return ret_dict
 
@@ -206,59 +214,64 @@ class SR_Eval:
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
-                key = 'proc_bw_%s_%s' % (low_rate, order)
+                key = 'proc_bw_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
                     ret_dict[key],_ = librosa.load(target_file, sr=sr)
                 else:
+                    # import ipdb; ipdb.set_trace()
                     ret_dict[key] = lowpass(x, low_rate // 2, sr, order=order, _type="butter")
                     sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
+        for k in ret_dict.keys(): assert ret_dict[k].shape == x.shape, str((ret_dict[k].shape, x.shape))
         return ret_dict
     
-
     def lowpass_bessel(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
-                key = 'proc_bessel_%s_%s' % (low_rate, order)
+                key = 'proc_bessel_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
                     ret_dict[key],_ = librosa.load(target_file, sr=sr)
                 else:
                     ret_dict[key] = lowpass(x, low_rate // 2, sr, order=order, _type="bessel")
                     sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
+        for k in ret_dict.keys(): assert ret_dict[k].shape == x.shape, str((ret_dict[k].shape, x.shape))
         return ret_dict
     
     def lowpass_ellip(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
-                key = 'proc_el_%s_%s' % (low_rate, order)
+                key = 'proc_el_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
                     ret_dict[key],_ = librosa.load(target_file, sr=sr)
                 else:
                     ret_dict[key] = lowpass(x, low_rate // 2, sr, order=order, _type="ellip")
                     sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
+        for k in ret_dict.keys(): assert ret_dict[k].shape == x.shape, str((ret_dict[k].shape, x.shape))
         return ret_dict
 
     def lowpass_chebyshev(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
-                key = 'proc_ch_%s_%s' % (low_rate, order)
+                key = 'proc_ch_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
                     ret_dict[key],_ = librosa.load(target_file, sr=sr)
                 else:
+                    # import ipdb; ipdb.set_trace()
                     ret_dict[key] = lowpass(x, low_rate // 2, sr, order=order, _type="cheby1")
                     sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
+        for k in ret_dict.keys(): assert ret_dict[k].shape == x.shape, str((ret_dict[k].shape, x.shape))
         return ret_dict
 
     def lowpass_stft_hard(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_fft['original_low_sample_rate']:
-            key = 'proc_fft_%s' % (low_rate)
+            key = 'proc_fft_%s_%s' % (low_rate, sr)
             target_file = self.cache_file_name(key, file)
             if(os.path.exists(target_file)): 
                 ret_dict[key],_ = librosa.load(target_file, sr=sr)
@@ -270,7 +283,7 @@ class SR_Eval:
     def lowpass_subsampling(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_subsampling['original_low_sample_rate']:
-            key = 'proc_subsampling_%s' % (low_rate)
+            key = 'proc_subsampling_%s_%s' % (low_rate, sr)
             target_file = self.cache_file_name(key, file)
             if(os.path.exists(target_file)): 
                 ret_dict[key],_ = librosa.load(target_file, sr=sr)

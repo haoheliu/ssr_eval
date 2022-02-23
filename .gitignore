@@ -7,4 +7,5 @@
 *DS_Store*
 *.pt*
 *.ckpt
-
+*wav*
+vctk_test

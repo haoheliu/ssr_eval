@@ -3,6 +3,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
+def to_log(input):
+    assert torch.sum(input < 0) == 0, str(input)+" has negative values counts "+str(torch.sum(input < 0))
+    return torch.log10(torch.clip(input, min=1e-8))
+
+def from_log(input):
+    input = torch.clip(input,min=-np.inf, max=5)
+    return 10 ** input
+
 class STFTMag(nn.Module):
     def __init__(self,
                  nfft=1024,

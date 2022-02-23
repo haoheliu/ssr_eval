@@ -87,7 +87,7 @@ class AudioMetrics():
             assert len(list(est.shape)) == 1 and len(list(target.shape)) == 1, "The input numpy array shape should be [samples,]. Got input shape %s and %s. " % (est.shape, target.shape)
             est_wav, target_wav = est, target
         
-        target_spec_path = os.path.join(os.path.dirname(file), os.path.splitext(os.path.basename(file))[0]+"_proc.pt")    
+        target_spec_path = os.path.join(os.path.dirname(file), os.path.splitext(os.path.basename(file))[0]+"_proc_%s.pt" % (self.rate))    
         if(os.path.exists(target_spec_path)):
             target_sp = torch.load(target_spec_path)    
         else:
