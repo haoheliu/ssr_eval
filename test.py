@@ -4,20 +4,22 @@ import sys
 git_root = git.Repo("", search_parent_directories=True).git.rev_parse("--show-toplevel")
 
 from sr_eval_vctk import SR_Eval, BasicTestee
-    
-
-LOW_SAMPLE_RATE=[4000,8000,12000,16000,24000,32000]
-LOW_KBPS=[32, 48, 64, 96, 128]
-FILTER_ORDERS=[3,6,9]
 
 class MyTestee(BasicTestee):
     def __init__(self) -> None:
         super().__init__()
         
-    def infer(self, x):
-        # x: np.array [sample,]
-        # return: np.array [sample,]
-        return x 
+    def infer(self, x, target):
+        """A testee that do nothing
+
+        Args:
+            x (np.array): [sample,]
+            target (np.array): [sample,]
+
+        Returns:
+            np.array: [sample,]
+        """
+        return x, {"additional_metrics":0.9}
     
 if __name__ == "__main__":
     testee = MyTestee()
@@ -41,6 +43,6 @@ if __name__ == "__main__":
                       } 
     )
     
-    handler.evaluate(limit_test_nums=10, limit_speaker=-1)
+    handler.evaluate(limit_test_nums=2, limit_speaker=-1)
     
     

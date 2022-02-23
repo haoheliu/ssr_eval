@@ -13,10 +13,10 @@ class BasicTestee:
         pass
     
     @abstractmethod
-    def infer(self, x):
+    def infer(self, x, target):
         # x: [sample,]
         # return: [sample, sample]
-        return x# before and after processing, should have the same shape
+        return x, {"additional_metrics":0.9}
     
 """_summary_
 test
@@ -63,8 +63,9 @@ class SR_Eval:
         processed_low_res_input = self.preprocess(file, sr=self.sr)
         target,_ = librosa.load(file, sr=self.sr)
         for k in processed_low_res_input.keys():
-            processed = self.testee.infer(processed_low_res_input[k])
+            processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
             metrics[k] = self.audio_metrics.evaluation(processed, target, file)
+            metrics[k].update(addtional_metrics)
         return metrics
 
     def get_test_file_list(self,path):

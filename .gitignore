@@ -5,3 +5,6 @@
 *pycache*
 *outputs
 *DS_Store*
+*.pt*
+*.ckpt
+
