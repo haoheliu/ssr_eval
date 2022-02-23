@@ -13,8 +13,8 @@ class MyTestee(BasicTestee):
         """A testee that do nothing
 
         Args:
-            x (np.array): [sample,]
-            target (np.array): [sample,]
+            x (np.array): [sample,], with original_sr sample rate
+            target (np.array): [sample,], with target_sr sample rate
 
         Returns:
             np.array: [sample,]
@@ -25,12 +25,13 @@ if __name__ == "__main__":
     testee = MyTestee()
     handler = SR_Eval(testee, 
                       test_name="basic_test", 
-                      test_data_root="./temp_test", 
-                      sr=44100,
+                      test_data_root="/vol/research/dcase2022/sr_eval_vctk/vctk_test", 
+                      original_sr=44100,
+                      target_sr=44100,
                       setting_lowpass_filtering = {
                           "filter":["cheby","butter"],
                           "original_low_sample_rate": [2000, 4000, 8000, 16000, 24000, 32000],
-                          "filter_order": [3,6,9]
+                          "filter_order": [6]
                       }, 
                       setting_subsampling = {
                           "original_low_sample_rate": [2000, 4000, 8000, 16000, 24000, 32000],

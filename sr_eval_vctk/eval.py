@@ -35,7 +35,8 @@ class SR_Eval:
                 testee,
                 test_name = "test", 
                 test_data_root = "./datasets/vctk_test",
-                sr=44100,
+                original_sr=None,
+                target_sr=44100,
                 setting_lowpass_filtering = None,
                 setting_subsampling = None,
                 setting_fft = None,
@@ -48,8 +49,9 @@ class SR_Eval:
         self.setting_fft = setting_fft
         self.setting_subsampling = setting_subsampling
         self.setting_mp3_compression = setting_mp3_compression
-            
-        self.sr = sr 
+        self.original_sr = original_sr
+        self.sr = target_sr 
+        if(self.original_sr is None): self.original_sr = self.sr
         self.audio_metrics = AudioMetrics(self.sr)
         self.unexpected_symbol_test_folder = "_.*#()_+=!@$%^&~"
         if(not os.path.exists(test_data_root)): os.makedirs(test_data_root, exist_ok=True)
@@ -66,7 +68,7 @@ class SR_Eval:
 
     def evaluate_single(self, file):
         metrics = {}
-        processed_low_res_input = self.preprocess(file, sr=self.sr)
+        processed_low_res_input = self.preprocess(file, sr=self.original_sr)
         target,_ = librosa.load(file, sr=self.sr)
         for k in processed_low_res_input.keys():
             processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
