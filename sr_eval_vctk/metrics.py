@@ -134,6 +134,7 @@ class AudioMetrics():
 if __name__ == '__main__':
     import numpy as np
     au = AudioMetrics(rate=44100)
-    path = "/Users/liuhaohe/Downloads/output_1500000_pitch_mas/lj_LJ008-0121.wav"
-    result = au.evaluation(path,path,path)
+    path1 = "p374_049_mic1.flac.flac"
+    path2 = "p374_049_mic1.flac_proc_fft_24000_24000.flac"
+    result = au.evaluation(path2,path1,path1)
     print(result)

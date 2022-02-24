@@ -26,8 +26,9 @@ if __name__ == "__main__":
     handler = SR_Eval(testee, 
                       test_name="basic_test", 
                       test_data_root="/vol/research/dcase2022/sr_eval_vctk/vctk_test", 
-                      original_sr=44100,
-                      target_sr=44100,
+                      model_input_sr=44100, # the input to the model  
+                      model_output_sr=44100
+                      evaluation_sr=44100, 
                       setting_lowpass_filtering = {
                           "filter":["cheby","butter"],
                           "original_low_sample_rate": [2000, 4000, 8000, 16000, 24000, 32000],

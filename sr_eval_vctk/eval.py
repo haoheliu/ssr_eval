@@ -18,7 +18,6 @@ class BasicTestee:
         else:
             return tensor.detach().numpy()
     
-    @abstractmethod
     def infer(self, x, target):
         # x: [sample,]
         # return: [sample, sample]
@@ -33,10 +32,12 @@ test
 class SR_Eval:
     def __init__(self,
                 testee,
+                model_input_sr, 
+                model_output_sr,
+                evaluationset_sr=44100, 
                 test_name = "test", 
                 test_data_root = "./datasets/vctk_test",
-                original_sr=None,
-                target_sr=44100,
+
                 setting_lowpass_filtering = None,
                 setting_subsampling = None,
                 setting_fft = None,
@@ -45,14 +46,19 @@ class SR_Eval:
         self.testee = testee
         self.test_name = test_name
         self.test_data_root = test_data_root
+        
         self.setting_lowpass_filtering = setting_lowpass_filtering
         self.setting_fft = setting_fft
         self.setting_subsampling = setting_subsampling
         self.setting_mp3_compression = setting_mp3_compression
-        self.original_sr = original_sr
-        self.sr = target_sr 
-        if(self.original_sr is None): self.original_sr = self.sr
-        self.audio_metrics = AudioMetrics(self.sr)
+        
+        self.model_input_sr = model_input_sr
+        self.model_output_sr = model_output_sr 
+        self.evaluationset_sr = evaluationset_sr
+        
+        assert self.evaluationset_sr <= 44100, "Our evaluation set only support up to 44.1k sample rate"
+        
+        self.audio_metrics = AudioMetrics(self.evaluationset_sr)
         self.unexpected_symbol_test_folder = "_.*#()_+=!@$%^&~"
         if(not os.path.exists(test_data_root)): os.makedirs(test_data_root, exist_ok=True)
         
@@ -68,10 +74,12 @@ class SR_Eval:
 
     def evaluate_single(self, file):
         metrics = {}
-        processed_low_res_input = self.preprocess(file, sr=self.original_sr)
-        target,_ = librosa.load(file, sr=self.sr)
+        processed_low_res_input = self.preprocess(file, sr=self.model_input_sr)
+        target,_ = librosa.load(file, sr=self.evaluationset_sr)
         for k in processed_low_res_input.keys():
             processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
+            if(self.model_output_sr != self.evaluationset_sr):
+                processed = librosa.resample(processed, self.model_output_sr, self.evaluationset_sr)
             metrics[k] = self.audio_metrics.evaluation(processed, target, file)
             metrics[k].update(addtional_metrics)
             # sf.write(file+k+"temp_del.wav", processed, self.sr) # todo
@@ -216,6 +224,7 @@ class SR_Eval:
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
+                if(low_rate == sr): low_rate -= 1
                 key = 'proc_bw_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
@@ -231,6 +240,7 @@ class SR_Eval:
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
+                if(low_rate == sr): low_rate -= 1
                 key = 'proc_bessel_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
@@ -245,6 +255,7 @@ class SR_Eval:
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
+                if(low_rate == sr): low_rate -= 1
                 key = 'proc_el_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
@@ -259,6 +270,7 @@ class SR_Eval:
         ret_dict = {}
         for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
             for order in self.setting_lowpass_filtering['filter_order']:
+                if(low_rate == sr): low_rate -= 1
                 key = 'proc_ch_%s_%s_%s' % (low_rate, order, sr)
                 target_file = self.cache_file_name(key, file)
                 if(os.path.exists(target_file)): 
@@ -273,6 +285,7 @@ class SR_Eval:
     def lowpass_stft_hard(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_fft['original_low_sample_rate']:
+            if(low_rate == sr): low_rate -= 1
             key = 'proc_fft_%s_%s' % (low_rate, sr)
             target_file = self.cache_file_name(key, file)
             if(os.path.exists(target_file)): 
@@ -285,6 +298,7 @@ class SR_Eval:
     def lowpass_subsampling(self, file, x, sr): 
         ret_dict = {}
         for low_rate in self.setting_subsampling['original_low_sample_rate']:
+            if(low_rate == sr): low_rate -= 1
             key = 'proc_subsampling_%s_%s' % (low_rate, sr)
             target_file = self.cache_file_name(key, file)
             if(os.path.exists(target_file)): 
