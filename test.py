@@ -23,28 +23,28 @@ class MyTestee(BasicTestee):
     
 if __name__ == "__main__":
     testee = MyTestee()
+    
     handler = SR_Eval(testee, 
-                      test_name="basic_test", 
+                      test_name="unprocessed", 
                       test_data_root="/vol/research/dcase2022/sr_eval_vctk/vctk_test", 
-                      model_input_sr=44100, # the input to the model  
-                      model_output_sr=44100
-                      evaluation_sr=44100, 
-                      setting_lowpass_filtering = {
+                      model_input_sr=44100,
+                      model_output_sr=44100,
+                      evaluationset_sr=44100,
+                        setting_lowpass_filtering = {
                           "filter":["cheby","butter"],
-                          "original_low_sample_rate": [2000, 4000, 8000, 16000, 24000, 32000],
-                          "filter_order": [6]
+                          "original_low_sample_rate": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
+                          "filter_order": [3,6,9]
                       }, 
                       setting_subsampling = {
-                          "original_low_sample_rate": [2000, 4000, 8000, 16000, 24000, 32000],
+                          "original_low_sample_rate": [2000, 4000, 8000, 12000,16000, 24000, 32000],
                       }, 
                       setting_fft = {
-                          "original_low_sample_rate": [2000, 4000, 8000, 16000, 24000, 32000],
+                          "original_low_sample_rate": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
                       }, 
                       setting_mp3_compression = {
                           "original_low_kbps": [32, 48, 64, 96, 128],
                       } 
     )
     
-    handler.evaluate(limit_test_nums=2, limit_speaker=-1)
-    
+    handler.evaluate(limit_test_nums=10, limit_speaker=-1)
     

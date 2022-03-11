@@ -69,7 +69,6 @@ class ResidualBlock(nn.Module):
         residual, skip = torch.chunk(y, 2, dim=1)
         return (x + residual) / sqrt(2.0), skip
 
-
 class NuWave(nn.Module):
     def __init__(self, hparams):
         super().__init__()

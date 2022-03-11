@@ -53,15 +53,11 @@ class AudioMetrics():
             start = offset // 2
             end = offset-start
             x = x[:,:,start:-end,:]
-            # x = x[:,:,offset:,:]
-            # x = x[:,:,:-offset,:]
         elif(x.size(dim) < y.size(dim)):  
             offset = y.size(dim)-x.size(dim)
             start = offset // 2
             end = offset-start
             y = y[:,:,start:-end,:]  
-            # y = y[:,:,offset:,:]   
-            # y = y[:,:,:-offset,:]   
         assert offset < 10, "Error: the offset %s is too large, check the code please" % (offset)
         return x,y
         

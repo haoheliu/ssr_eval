@@ -9,3 +9,8 @@
 *.ckpt
 *wav*
 vctk_test
+*.tar
+*.xlsx
+*.json 
+visualize*
+ckpt*

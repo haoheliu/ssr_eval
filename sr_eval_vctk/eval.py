@@ -37,15 +37,18 @@ class SR_Eval:
                 evaluationset_sr=44100, 
                 test_name = "test", 
                 test_data_root = "./datasets/vctk_test",
-
+                
                 setting_lowpass_filtering = None,
                 setting_subsampling = None,
                 setting_fft = None,
-                setting_mp3_compression = None):
+                setting_mp3_compression = None,
+                
+                save_processed_result = False):
         
         self.testee = testee
         self.test_name = test_name
         self.test_data_root = test_data_root
+        self.save_processed_result = save_processed_result
         
         self.setting_lowpass_filtering = setting_lowpass_filtering
         self.setting_fft = setting_fft
@@ -75,14 +78,25 @@ class SR_Eval:
     def evaluate_single(self, file):
         metrics = {}
         processed_low_res_input = self.preprocess(file, sr=self.model_input_sr)
-        target,_ = librosa.load(file, sr=self.evaluationset_sr)
+        target,_ = librosa.load(file, sr=self.model_input_sr)
+        target_for_eval = librosa.resample(target, self.model_input_sr, self.evaluationset_sr)
+        
         for k in processed_low_res_input.keys():
-            processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
+            result_fname = file+k+"_processed_"+self.test_name+".wav"
+            
+            # Reload previous result if saved
+            if(not os.path.exists(result_fname)):
+                processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
+            else:
+                processed,_ = librosa.load(result_fname, sr=self.evaluationset_sr)
+                addtional_metrics = {}
+                
             if(self.model_output_sr != self.evaluationset_sr):
                 processed = librosa.resample(processed, self.model_output_sr, self.evaluationset_sr)
-            metrics[k] = self.audio_metrics.evaluation(processed, target, file)
+                
+            metrics[k] = self.audio_metrics.evaluation(processed, target_for_eval, file)
             metrics[k].update(addtional_metrics)
-            # sf.write(file+k+"temp_del.wav", processed, self.sr) # todo
+            if(self.save_processed_result): sf.write(result_fname, processed, self.evaluationset_sr) # todo
         return metrics
 
     def get_test_file_list(self,path):
