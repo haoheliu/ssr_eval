@@ -10,7 +10,9 @@
 *wav*
 vctk_test
 *.tar
+final*
 *.xlsx
 *.json 
 visualize*
 ckpt*
+testees*
