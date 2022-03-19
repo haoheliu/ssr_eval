@@ -25,7 +25,7 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'torchsubband'
+NAME = 'sr_eval_vctk'
 DESCRIPTION = 'This package is written for the evaluation of speech super-resolution.'
 URL = 'https://github.com/haoheliu/sr_eval_vctk'
 EMAIL = 'haoheliu@gmail.com'

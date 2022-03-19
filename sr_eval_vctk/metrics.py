@@ -130,7 +130,7 @@ class AudioMetrics():
 if __name__ == '__main__':
     import numpy as np
     au = AudioMetrics(rate=44100)
-    path1 = "p374_049_mic1.flac.flac"
-    path2 = "p374_049_mic1.flac_proc_fft_24000_24000.flac"
+    path1 = "/vol/research/dcase2022/sr_eval_vctk/sr_eval_vctk/s5_126_mic1.flac.flac"
+    path2 = "/vol/research/dcase2022/sr_eval_vctk/sr_eval_vctk/s5_126_mic1.flac.flacproc_fft_8000_24000_processed_WSRGlow_2_ratio.wav"
     result = au.evaluation(path2,path1,path1)
     print(result)

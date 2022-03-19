@@ -74,26 +74,29 @@ class SR_Eval:
             print(cmd); os.system(cmd)
             print(cmd2); os.system(cmd2)
             print(cmd3); os.system(cmd3)
-
+            
     def evaluate_single(self, file):
         metrics = {}
         processed_low_res_input = self.preprocess(file, sr=self.model_input_sr)
-        target,_ = librosa.load(file, sr=self.model_input_sr)
-        target_for_eval = librosa.resample(target, self.model_input_sr, self.evaluationset_sr)
+        target,sr_target = librosa.load(file, sr=None)
+        target_for_eval = librosa.resample(target, sr_target, self.evaluationset_sr)
         
         for k in processed_low_res_input.keys():
             result_fname = file+k+"_processed_"+self.test_name+".wav"
-            
             # Reload previous result if saved
             if(not os.path.exists(result_fname)):
-                processed, addtional_metrics = self.testee.infer(processed_low_res_input[k], target)
+                ret = self.testee.infer(processed_low_res_input[k], target)
+                if(type(ret) == tuple):
+                    processed, addtional_metrics = ret
+                else:
+                    processed = ret
+                    additional_metrics = {}
             else:
                 processed,_ = librosa.load(result_fname, sr=self.evaluationset_sr)
                 addtional_metrics = {}
                 
             if(self.model_output_sr != self.evaluationset_sr):
                 processed = librosa.resample(processed, self.model_output_sr, self.evaluationset_sr)
-                
             metrics[k] = self.audio_metrics.evaluation(processed, target_for_eval, file)
             metrics[k].update(addtional_metrics)
             if(self.save_processed_result): sf.write(result_fname, processed, self.evaluationset_sr) # todo
@@ -221,7 +224,6 @@ class SR_Eval:
                 ret_dict[key], _ = librosa.load(temp_file, sr=sr)
                 os.system(cmd4)
                 ret_dict[key],x = self.unify_length(ret_dict[key],x)
-                # import ipdb; ipdb.set_trace()
                 shft01 = np.argmax(correlate(ret_dict[key], x)) - x.shape[0]
                 shifted = self.shift(ret_dict[key], shft01)
                 sf.write(target_file, shifted[...,None], samplerate=sr)
@@ -321,12 +323,3 @@ class SR_Eval:
                 ret_dict[key] = lowpass(x, low_rate // 2, sr, order=1, _type="subsampling")
                 sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
         return ret_dict
-
-
-
-
-
-
-
-
-            

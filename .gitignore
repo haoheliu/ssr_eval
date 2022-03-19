@@ -15,4 +15,6 @@ final*
 *.json 
 visualize*
 ckpt*
+*e2e_models*
+*nuwave*
 testees*
