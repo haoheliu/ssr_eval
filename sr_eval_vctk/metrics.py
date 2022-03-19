@@ -13,13 +13,6 @@ from sr_eval_vctk.utils import *
 
 EPS = 1e-12
 
-class ImageMetrics():
-    def __init__(self):
-        pass
-
-    def evaluate(self, input, output):
-        pass
-
 class AudioMetrics():
     def __init__(self, rate):
         self.rate = rate

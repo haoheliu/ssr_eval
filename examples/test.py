@@ -19,13 +19,13 @@ class MyTestee(BasicTestee):
         Returns:
             np.array: [sample,]
         """
-        return x, {}
+        return x, {"additional_metrics_of_this_audio": 1.0}
     
 if __name__ == "__main__":
     testee = MyTestee()
     
     handler = SR_Eval(testee, 
-                      test_name="unprocessed", 
+                      test_name="unprocess", 
                       test_data_root="/vol/research/dcase2022/sr_eval_vctk/vctk_test", 
                       model_input_sr=44100,
                       model_output_sr=44100,

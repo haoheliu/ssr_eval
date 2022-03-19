@@ -10,7 +10,6 @@ EPS=1e-12
 import torch
 from pynvml import *
 
-
 def convert_wav_to_flac(dir):
     current = "wav"
     files = glob.glob(os.path.join(dir, "*." + current)) + \

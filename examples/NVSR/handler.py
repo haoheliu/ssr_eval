@@ -1,6 +1,6 @@
 import sys
-sys.path.append("/vol/research/dcase2022/project/sr_eval_vctk")
-sys.path.append("/vol/research/dcase2022/project/sr_eval_vctk/examples")
+# sys.path.append("/vol/research/dcase2022/project/sr_eval_vctk")
+# sys.path.append("/vol/research/dcase2022/project/sr_eval_vctk/examples")
 import time
 import librosa
 import torch
