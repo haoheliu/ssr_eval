@@ -9,7 +9,7 @@ import librosa
 import torch
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
-from sr_eval_vctk.utils import *
+from ssr_eval.utils import *
 
 EPS = 1e-12
 
@@ -76,22 +76,21 @@ class AudioMetrics():
             assert len(list(est.shape)) == 1 and len(list(target.shape)) == 1, "The input numpy array shape should be [samples,]. Got input shape %s and %s. " % (est.shape, target.shape)
             est_wav, target_wav = est, target
         
-        target_spec_path = os.path.join(os.path.dirname(file), os.path.splitext(os.path.basename(file))[0]+"_proc_%s.pt" % (self.rate))    
-        if(os.path.exists(target_spec_path)):
-            target_sp = torch.load(target_spec_path)    
-        else:
-            target_sp = self.wav_to_spectrogram(target_wav)
-            torch.save(target_sp, target_spec_path)
-        
+        # target_spec_path = os.path.join(os.path.dirname(file), os.path.splitext(os.path.basename(file))[0]+"_proc_%s.pt" % (self.rate))    
+        # if(os.path.exists(target_spec_path)):
+        #     target_sp = torch.load(target_spec_path)    
+        # else:
+        target_sp = self.wav_to_spectrogram(target_wav)
+        # torch.save(target_sp, target_spec_path)
         est_sp = self.wav_to_spectrogram(est_wav)
         
         result = {}        
         # frequency domain
         
         result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
-        result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
-        result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
-        result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
+        # result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
+        # result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
+        # result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
 
         for key in result: result[key] = float(result[key])
         return result
@@ -123,7 +122,9 @@ class AudioMetrics():
 if __name__ == '__main__':
     import numpy as np
     au = AudioMetrics(rate=44100)
-    path1 = "/vol/research/dcase2022/sr_eval_vctk/sr_eval_vctk/s5_126_mic1.flac.flac"
-    path2 = "/vol/research/dcase2022/sr_eval_vctk/sr_eval_vctk/s5_126_mic1.flac.flacproc_fft_8000_24000_processed_WSRGlow_2_ratio.wav"
+    # path1 = "old/out.wav"
+    path1 = "eeeeee.wav"
+    # path2 = "old/target.wav"
+    path2 = "targete.wav"
     result = au.evaluation(path2,path1,path1)
     print(result)

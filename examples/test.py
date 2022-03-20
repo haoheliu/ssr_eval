@@ -1,5 +1,4 @@
 import git
-import sys
 
 git_root = git.Repo("", search_parent_directories=True).git.rev_parse("--show-toplevel")
 
@@ -9,7 +8,7 @@ class MyTestee(BasicTestee):
     def __init__(self) -> None:
         super().__init__()
     
-    def infer(self, x, target):
+    def infer(self, x):
         """A testee that do nothing
 
         Args:
@@ -19,31 +18,31 @@ class MyTestee(BasicTestee):
         Returns:
             np.array: [sample,]
         """
-        return x, {"additional_metrics_of_this_audio": 1.0}
+        return x
     
 if __name__ == "__main__":
     testee = MyTestee()
-    
     handler = SR_Eval(testee, 
                       test_name="unprocess", 
-                      test_data_root="/vol/research/dcase2022/sr_eval_vctk/vctk_test", 
-                      model_input_sr=44100,
-                      model_output_sr=44100,
-                      evaluationset_sr=44100,
-                        setting_lowpass_filtering = {
+                      test_data_root="./your_path/vctk_test", 
+                      input_sr=44100,
+                      output_sr=44100,
+                      evaluationset_sr=16000,
+                      setting_lowpass_filtering = {
                           "filter":["cheby","butter"],
-                          "original_low_sample_rate": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
+                          "cutoff_freq": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
                           "filter_order": [3,6,9]
                       }, 
                       setting_subsampling = {
-                          "original_low_sample_rate": [2000, 4000, 8000, 12000,16000, 24000, 32000],
+                          "cutoff_freq": [2000, 4000, 8000, 12000,16000, 24000, 32000],
                       }, 
                       setting_fft = {
-                          "original_low_sample_rate": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
+                          "cutoff_freq": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
                       }, 
                       setting_mp3_compression = {
-                          "original_low_kbps": [32, 48, 64, 96, 128],
-                      } 
+                          "low_kbps": [32, 48, 64, 96, 128],
+                      },
+                      save_processed_result=False,
     )
     
     handler.evaluate(limit_test_nums=10, limit_speaker=-1)

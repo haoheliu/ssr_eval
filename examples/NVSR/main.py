@@ -169,12 +169,11 @@ if __name__ == '__main__':
         testee = eval(test_name)(device="cuda")
         sr_eval = SR_Eval(testee, 
                         test_name=test_name, 
-                        test_data_root="/vol/research/dcase2022/project/ssr_eval/vctk_test", 
-                        model_input_sr=44100,
-                        model_output_sr=44100,
-                        evaluationset_sr=44100,
+                        input_sr=44100,
+                        output_sr=44100,
+                        evaluation_sr=44100,
                         setting_fft = {
-                            "original_low_sample_rate": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
+                            "cutoff_freq": [1000, 2000, 4000, 6000, 8000, 12000, 16000],
                         }, 
                         save_processed_result=False,
         )

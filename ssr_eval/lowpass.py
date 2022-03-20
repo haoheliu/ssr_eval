@@ -1,6 +1,9 @@
+
+import sys  
+sys.path.append("/vol/research/dcase2022/project/ssr_eval")
 from scipy.signal import butter
 import torch
-from sr_eval_vctk.dsp import FDomainHelper
+from ssr_eval.dsp import FDomainHelper
 import librosa
 import numpy as np
 
