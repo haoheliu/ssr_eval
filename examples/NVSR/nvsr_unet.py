@@ -85,8 +85,8 @@ class NVSR(pl.LightningModule):
 
         # masking
         self.generator = Generator(model_name).to(device)
-        print(get_n_params(self.vocoder))
-        print(get_n_params(self.generator))
+        # print(get_n_params(self.vocoder))
+        # print(get_n_params(self.generator))
         
 
     def get_vocoder(self):
