@@ -168,7 +168,7 @@ class SSR_Eval_Helper:
                 ret.append(file)
         return ret
 
-    def evaluate(self, limit_test_nums=-1, limit_speaker=-1):
+    def evaluate(self, limit_test_nums=-1, limit_test_speaker=-1):
         from tqdm import tqdm
         from datetime import datetime
 
@@ -182,7 +182,7 @@ class SSR_Eval_Helper:
                 continue  # MacOS files
             if "p" not in speaker and "s" not in speaker:
                 continue
-            if limit_speaker > 0 and len(final_result.keys()) >= limit_speaker:
+            if limit_test_speaker > 0 and len(final_result.keys()) >= limit_test_speaker:
                 break
             print("Speaker:", speaker)
             final_result[speaker] = {}

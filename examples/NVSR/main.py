@@ -166,8 +166,11 @@ class NVSRPaddingPostProcTestee(NVSRBaseTestee):
 if __name__ == "__main__":
     import soundfile as sf
 
+    if(torch.cuda.is_available()): device = "cuda"
+    else: device="cpu"
+    
     for test_name in ["NVSRPostProcTestee"]:
-        testee = eval(test_name)(device="cuda")
+        testee = eval(test_name)(device=device)
         helper = SSR_Eval_Helper(
             testee,
             test_name=test_name,
