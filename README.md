@@ -1,6 +1,7 @@
 # SSR_EVAL
 What this repo do:
 - A toolbox for the evaluation of speech super-resolution algorithms.
+- Unify the evaluation pipline of speech super-resolution algorithms for a easier comparison between different systems.
 - Benchmarking speech super-resolution methods (pull request is welcome!). Encouraging reproducible research.
 
 ![sdf](pics/main.png)
@@ -16,7 +17,7 @@ Please make sure you have already installed [sox](http://sox.sourceforge.net/sox
 
 <b>A basic example:</b> Evaluate on a system that do nothing:
 
-```
+```python
 from ssr_eval import test 
 test()
 ```
@@ -142,6 +143,14 @@ helper.evaluate(limit_test_nums=10, # For each speaker, only evaluate on 10 utte
                 )
 ```
 
-## Dataset Details
-The evaluation set is the VCTK Multi-Speaker benchmark.
+I recommand all the users to use 'setting_fft' to perform the evaluation for the convinence of comparing between different system.
 
+## Dataset Details
+We build the test sets using VCTK (version 0.92), a multi-speaker English corpus that contains 110 speakers with different accents. 
+- Speakers used for the test set: p360, p361, p362, p363, p364, p374, p376, s5
+- For the remaining 100 speakers, p280 and p315 are omitted for the technical issues.
+- Other 98 speakers are used for training.
+
+## Citation
+
+Comming soon
