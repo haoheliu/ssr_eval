@@ -1,8 +1,8 @@
-# SSR_EVAL
+# Speech Super-resolution Evaluation and Benchmarking
 What this repo do:
 - A toolbox for the evaluation of speech super-resolution algorithms.
 - Unify the evaluation pipline of speech super-resolution algorithms for a easier comparison between different systems.
-- Benchmarking speech super-resolution methods (pull request is welcome!). Encouraging reproducible research.
+- Benchmarking speech super-resolution methods (pull request is welcome). Encouraging reproducible research.
 
 ![sdf](pics/main.png)
 

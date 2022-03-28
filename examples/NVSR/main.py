@@ -2,7 +2,6 @@ import time
 import librosa
 import torch
 import os
-import ssr_eval
 from nvsr_unet import NVSR as Model
 import numpy as np
 from ssr_eval import SSR_Eval_Helper, BasicTestee
