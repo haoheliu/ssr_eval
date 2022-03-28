@@ -1,10 +1,10 @@
 # Speech Super-resolution Evaluation and Benchmarking
-What this repo do:
+<b>What this repo do:</b>
 - A toolbox for the evaluation of speech super-resolution algorithms.
 - Unify the evaluation pipline of speech super-resolution algorithms for a easier comparison between different systems.
 - Benchmarking speech super-resolution methods (pull request is welcome). Encouraging reproducible research.
 
-![sdf](pics/main.png)
+I build this repo while I'm writing my paper for INTERSPEECH 2022: <i>Neural Vocoder is All You Need for Speech Super-resolution</i>. The model mentioned in this paper, NVSR, will also be open-sourced here.
 
 ## Installation  
 Install via pip:
@@ -34,8 +34,8 @@ test()
         }
     }
 ```
-
 <hr>
+![sdf](https://github.com/haoheliu/ssr_eval/blob/main/pics/main.png)
 
 Below is the code of test()
 
