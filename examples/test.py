@@ -1,10 +1,3 @@
-import git
-import sys
-sys.path.append("/vol/research/dcase2022/project/ssr_eval")
-sys.path.append("/vol/research/dcase2022/project/ssr_eval/examples")
-
-git_root = git.Repo("", search_parent_directories=True).git.rev_parse("--show-toplevel")
-
 from ssr_eval import SSR_Eval_Helper, BasicTestee
 
 class MyTestee(BasicTestee):

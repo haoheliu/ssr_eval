@@ -13,8 +13,8 @@ pip3 install ssr_eval
 Please make sure you have already installed [sox](http://sox.sourceforge.net/sox.html).
 
 ## Quick Example
-examples/test.py: 
 ```python
+# examples/test2.py:
 from ssr_eval import SSR_Eval_Helper, BasicTestee
 
 # You need to implement a class for the model to be evaluated.
@@ -50,19 +50,19 @@ helper = SSR_Eval_Helper(testee,
 # Perform evaluation
 helper.evaluate()
 ```
-The code will automatically handle stuffs like downloading test sets.
+The code will automatically handle stuffs like downloading test sets. The evaluation result will be saved in the ./results directory.
 
 ## Baselines
 
-We provide several pretrained baselines. For example, to run the NVSR baseline, you can click link in the following table for more details. 
+We provide several pretrained baselines. For example, to run the NVSR baseline, you can click the link in the following table for more details. 
 
 <hr>
 
-<b>Table.1 Performance of different speech super-resolution methods on different input sampling-rate (Evaluated on 44.1kHz).</b>
+<b>Table.1 Log-spectral distance (LSD) on different input sampling-rate (Evaluated on 44.1kHz).</b>
 
 |  Method | One for all | Params| 2kHz | 4kHz | 8kHz | 12kHz | 16kHz | 24kHz | 32kHz |  AVG |
 |:--------------------:|:----:|:----:|:----:|:----:|:----:|:-----:|:-----:|:-----:|:-----:|:----:|
-| [NVSR](https://github.com/haoheliu/ssr_eval/tree/main/examples/NVSR) | Yes | 99.0M | 1.04 | 0.98 | 0.91 |  0.85 |  0.79 |  0.70 |  0.60 | 0.84 |
+| NVSR [[Pretrained Model](https://github.com/haoheliu/ssr_eval/tree/main/examples/NVSR)] | Yes | 99.0M | 1.04 | 0.98 | 0.91 |  0.85 |  0.79 |  0.70 |  0.60 | 0.84 |
 | WSRGlow(24kHz→48kHz) | No | 229.9M | - | - | - |  - |  - |  0.79 |  - | - |
 | WSRGlow(12kHz→48kHz) | No | 229.9M | - | - | - |  0.87 |  - |  - |  - | - |
 | WSRGlow(8kHz→48kHz) | No | 229.9M | - | - | 0.98 |  - |  - |  - |  - | - |
