@@ -31,15 +31,17 @@ URL = "https://github.com/haoheliu/ssr_eval"
 EMAIL = "haoheliu@gmail.com"
 AUTHOR = "Haohe Liu"
 REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
     "librosa",
     "soundfile",
-    "scipy",
+    "scikit-image",
     "wave",
     "torch>=1.6.0",
+    "torchlibrosa>=0.0.7"
+    "tqdm"
 ]
 
 # What packages are optional?
