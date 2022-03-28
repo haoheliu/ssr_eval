@@ -38,7 +38,7 @@ REQUIRED = [
     "librosa",
     "soundfile",
     "scipy",
-    "torch>=1.6.0"
+    "torch>=1.6.0",
 ]
 
 # What packages are optional?

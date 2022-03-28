@@ -16,16 +16,8 @@ EPS = 1e-12
 class AudioMetrics():
     def __init__(self, rate):
         self.rate = rate
-        if(self.rate == 44100):
-            self.hop_length = 441
-            self.n_fft = 2048
-        elif(self.rate == 16000):
-            self.hop_length = 160
-            self.n_fft = 743
-        else:
-            self.hop_length = 441
-            self.n_fft = 2048
-        # self.metrics = sm.load(['sisdr','stoi','pesq','bsseval'], np.inf)
+        self.hop_length = int(rate/100)
+        self.n_fft = int(2048/(44100/rate))
 
     def read(self, est, target):
         est,_ = librosa.load(est,sr=self.rate,mono=True)
@@ -84,19 +76,18 @@ class AudioMetrics():
         # torch.save(target_sp, target_spec_path)
         est_sp = self.wav_to_spectrogram(est_wav)
         
-        result = {}        
+        result = {}       
+         
         # frequency domain
-        
         result["lsd"] = self.lsd(est_sp.clone(), target_sp.clone())
-        # result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
-        # result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
-        # result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
+        result["log_sispec"] = self.sispec(to_log(est_sp.clone()), to_log(target_sp.clone()))
+        result["sispec"] = self.sispec(est_sp.clone(), target_sp.clone())
+        result["ssim"] = self.ssim(est_sp.clone(), target_sp.clone())
 
         for key in result: result[key] = float(result[key])
         return result
 
     def lsd(self,est, target):
-        # lsd = torch.log10((target**2/(est**2 + EPS)) + EPS)**2
         lsd = torch.log10(target**2/((est+EPS) ** 2) + EPS)**2
         lsd = torch.mean(torch.mean(lsd,dim=3)**0.5,dim=2)
         return lsd[...,None,None]

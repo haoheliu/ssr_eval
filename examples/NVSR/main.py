@@ -7,7 +7,7 @@ import torch
 import os
 from examples.NVSR.nvsr_unet import NVSR as Model
 import numpy as np 
-from ssr_eval import SR_Eval, BasicTestee
+from ssr_eval import SSR_Eval_Helper, BasicTestee
 
 torch.manual_seed(234)
 EPS=1e-9
@@ -72,28 +72,11 @@ class NVSRBaseTestee(BasicTestee):
         sp, _, _ = self.model.f_helper.wav_to_spectrogram_phase(input)
         mel_orig = self.model.mel(sp.permute(0,1,3,2)).permute(0,1,3,2)
         return sp, mel_orig
-    
-    def find_cutoff(self, x, threshold=0.95):
-        threshold = x[-1] * threshold
-        for i in range(1, x.shape[0]):
-            if(x[-i] < threshold): 
-                return x.shape[0]-i 
-        return 0
-    
-    def get_cutoff_index(self, x):
-        stft_x = np.abs(librosa.stft(x))
-        energy = np.cumsum(np.sum(stft_x,axis=-1))
-        return self.find_cutoff(energy, 0.97), stft_x
-    
-    def replace_lr(self, x, out):
-        # Replace the low resolution part with the ground truth
-        length = out.shape[0]
-        cutoffratio, stft_x = self.get_cutoff_index(x)
-        stft_gt =librosa.stft(x)
-        stft_out = librosa.stft(out)
-        stft_out[:cutoffratio,...] = stft_gt[:cutoffratio,...]
-        out_renewed = librosa.istft(stft_out, length=length)
-        return out_renewed
+
+    def perform(self, filename):
+        x,_ = librosa.load(filename, sr=44100)
+        res = self.infer(x)
+        sf.write("result.wav",res, 44100)
 
     def infer(self, x):
         return x
@@ -127,7 +110,7 @@ class NVSRPostProcTestee(NVSRBaseTestee):
             out, _ = trim_center(out, segment)
             out = self.tensor2numpy(out)
             out = np.squeeze(out)
-            out = self.replace_lr(x, out)
+            out = self.postprocessing(x, out)
         return out
   
 class NVSRPaddingPostProcTestee(NVSRBaseTestee):
@@ -160,24 +143,24 @@ class NVSRPaddingPostProcTestee(NVSRBaseTestee):
             out, _ = trim_center(out, segment)
             out = self.tensor2numpy(out)
             out = np.squeeze(out)
-            out = self.replace_lr(x, out)
+            out = self.postprocessing(x, out)
         return out    
   
 if __name__ == '__main__':
     import soundfile as sf
     for test_name  in ["NVSRPostProcTestee"]:
         testee = eval(test_name)(device="cuda")
-        sr_eval = SR_Eval(testee, 
+        helper = SSR_Eval_Helper(testee, 
                         test_name=test_name, 
                         input_sr=44100,
                         output_sr=44100,
                         evaluation_sr=44100,
                         setting_fft = {
-                            "cutoff_freq": [1000, 2000, 4000, 6000, 8000, 12000, 16000],
+                            "cutoff_freq": [1000, 2000, 4000, 6000, 8000, 12000],
                         }, 
-                        save_processed_result=False,
+                        save_processed_result=True,
         )
-        sr_eval.evaluate(limit_test_nums=10, limit_speaker=-1)  
+        helper.evaluate(limit_test_nums=1, limit_speaker=-1)  
         
     
     

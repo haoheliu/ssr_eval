@@ -1,8 +1,11 @@
 import git
+import sys
+sys.path.append("/vol/research/dcase2022/project/ssr_eval")
+sys.path.append("/vol/research/dcase2022/project/ssr_eval/examples")
 
 git_root = git.Repo("", search_parent_directories=True).git.rev_parse("--show-toplevel")
 
-from sr_eval_vctk import SR_Eval, BasicTestee
+from ssr_eval import SSR_Eval_Helper, BasicTestee
 
 class MyTestee(BasicTestee):
     def __init__(self) -> None:
@@ -22,22 +25,22 @@ class MyTestee(BasicTestee):
     
 if __name__ == "__main__":
     testee = MyTestee()
-    handler = SR_Eval(testee, 
+    helper = SSR_Eval_Helper(testee, 
                       test_name="unprocess", 
                       test_data_root="./your_path/vctk_test", 
                       input_sr=44100,
                       output_sr=44100,
-                      evaluationset_sr=16000,
+                      evaluation_sr=44100,
                       setting_lowpass_filtering = {
                           "filter":["cheby","butter"],
-                          "cutoff_freq": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
+                          "cutoff_freq": [1000, 2000, 4000, 6000, 8000, 12000, 16000],
                           "filter_order": [3,6,9]
                       }, 
                       setting_subsampling = {
-                          "cutoff_freq": [2000, 4000, 8000, 12000,16000, 24000, 32000],
+                          "cutoff_freq": [1000, 2000, 4000, 6000, 8000, 12000, 16000],
                       }, 
                       setting_fft = {
-                          "cutoff_freq": [2000, 4000, 8000, 12000, 16000, 24000, 32000],
+                          "cutoff_freq": [1000, 2000, 4000, 6000, 8000, 12000, 16000],
                       }, 
                       setting_mp3_compression = {
                           "low_kbps": [32, 48, 64, 96, 128],

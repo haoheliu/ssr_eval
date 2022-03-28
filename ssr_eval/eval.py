@@ -8,9 +8,36 @@ from ssr_eval.metrics import AudioMetrics
 from ssr_eval.utils import * 
 from ssr_eval.lowpass import lowpass
 
+# ----------------------------------------------------------------
+# README:
+# Define several functions for data generation.
+# ----------------------------------------------------------------
+
 class BasicTestee:
     def __init__(self) -> None:
         pass
+    
+    def _find_cutoff(self, x, threshold=0.95):
+        threshold = x[-1] * threshold
+        for i in range(1, x.shape[0]):
+            if(x[-i] < threshold): 
+                return x.shape[0]-i 
+        return 0
+    
+    def _get_cutoff_index(self, x):
+        stft_x = np.abs(librosa.stft(x))
+        energy = np.cumsum(np.sum(stft_x,axis=-1))
+        return self._find_cutoff(energy, 0.97)
+    
+    def postprocessing(self, x, out):
+        # Replace the low resolution part with the ground truth
+        length = out.shape[0]
+        cutoffratio = self._get_cutoff_index(x)
+        stft_gt =librosa.stft(x)
+        stft_out = librosa.stft(out)
+        stft_out[:cutoffratio,...] = stft_gt[:cutoffratio,...]
+        out_renewed = librosa.istft(stft_out, length=length)
+        return out_renewed
     
     def tensor2numpy(self, tensor):
         if("cuda" in str(tensor.device)):
@@ -29,7 +56,7 @@ test
     -p361
     ...
 """
-class SR_Eval:
+class SSR_Eval_Helper:
     def __init__(self,
                 testee,
                 input_sr, 
@@ -77,8 +104,8 @@ class SR_Eval:
             
     def _cutoff2sr(self,dic):
         if(dic is None): return None 
-        else: dic["cutoff_freq"] *= 2
-        return dict
+        else: dic["cutoff_freq"] = [x*2 for x in dic["cutoff_freq"]]
+        return dic
     
     def evaluate_single(self, file):
         metrics = {}
@@ -119,21 +146,21 @@ class SR_Eval:
         final_result = {}
         result_cache = {}
         averaged_result = {}
-        os.makedirs("outputs", exist_ok=True)
+        os.makedirs("results", exist_ok=True)
         
         for speaker in sorted(os.listdir(self.test_data_root)):
-            if("DS_Store" in speaker or "_" in speaker): continue # MacOS files
+            if(not os.path.isdir(os.path.join(self.test_data_root, speaker))): continue # MacOS files
             if("p" not in speaker and "s" not in speaker): continue
             if(limit_speaker > 0 and len(final_result.keys()) >= limit_speaker): break
-            
             print("Speaker:", speaker)
             final_result[speaker] = {}
-            for i, file in enumerate(tqdm(sorted(self.get_test_file_list(os.path.join(self.test_data_root, speaker))))):
+            files = sorted(self.get_test_file_list(os.path.join(self.test_data_root, speaker)))
+            assert len(files) != 0, os.path.join(self.test_data_root, speaker)
+            for i, file in enumerate(tqdm(files)):
                 if(limit_test_nums > 0): 
                     if(i >= limit_test_nums): break
                 audio_path = os.path.join(self.test_data_root, speaker, file)
                 final_result[speaker][file] = self.evaluate_single(audio_path)
-        
         # import ipdb; ipdb.set_trace()
         for speaker in final_result.keys():        
             result_cache[speaker] = {}
@@ -148,7 +175,7 @@ class SR_Eval:
         final_result['averaged'] = averaged_result
         now = datetime.now()
         save_path = str(str(now.date())+"-"+str(now.time()))+"-"+self.test_name+".json"
-        write_json(final_result, os.path.join("outputs", save_path))
+        write_json(final_result, os.path.join("results", save_path))
         return final_result
     
     def preprocess(self, file, sr):
@@ -237,12 +264,13 @@ class SR_Eval:
 
     def lowpass_butterworth(self, file, x, sr): 
         ret_dict = {}
-        for low_rate in self.setting_lowpass_filtering['original_low_sample_rate']:
+        for low_rate in self.setting_lowpass_filtering['cutoff_freq']:
             for order in self.setting_lowpass_filtering['filter_order']:
                 if(low_rate == sr): low_rate -= 1
                 key = 'proc_bw_%s_%s_%s' % (low_rate, order, sr)
                 # target_file = self.cache_file_name(key, file)
                 # import ipdb; ipdb.set_trace()
+                print(low_rate, sr)
                 ret_dict[key] = lowpass(x, low_rate // 2, sr, order=order, _type="butter")
                 # sf.write(target_file, ret_dict[key][...,None], samplerate=sr)
         for k in ret_dict.keys(): assert ret_dict[k].shape == x.shape, str((ret_dict[k].shape, x.shape))
