@@ -13,15 +13,38 @@ pip3 install ssr_eval
 Please make sure you have already installed [sox](http://sox.sourceforge.net/sox.html).
 
 ## Quick Example
+
+<b>A basic example:</b> Evaluate on a system that do nothing:
+
+```
+from ssr_eval import test 
+test()
+```
+- The evaluation result json file will be stored in the ./results directory: [Example file](https://github.com/haoheliu/ssr_eval/blob/main/examples/results/2022-03-28-18:07:54.109221-unprocessed.json)
+- The code will automatically handle stuffs like downloading test sets.
+- You will find a field "averaged" at the bottom of the json file that looks like below. This field mark the performance of the system.
+```json
+"averaged": {
+        "proc_fft_24000_44100": {
+            "lsd": 5.152331300436993,
+            "log_sispec": 5.8051057146229095,
+            "sispec": 30.23394207533686,
+            "ssim": 0.8484425044157442
+        }
+    }
+```
+
+<hr>
+
+Below is the code of test()
+
 ```python
-# examples/test2.py:
 from ssr_eval import SSR_Eval_Helper, BasicTestee
 
 # You need to implement a class for the model to be evaluated.
 class MyTestee(BasicTestee):
     def __init__(self) -> None:
         super().__init__()
-    
 
     # You need to implement this function
     def infer(self, x):
@@ -35,20 +58,25 @@ class MyTestee(BasicTestee):
             np.array: [sample,]
         """
         return x
-    
-testee = MyTestee()
-# Initialize a evaluation helper
-helper = SSR_Eval_Helper(testee, 
-                    test_name="unprocessed", # Test name for storing the result
-                    input_sr=44100, # The sampling rate of the input x in the 'infer' function
-                    output_sr=44100, # The sampling rate of the output x in the 'infer' function
-                    evaluation_sr=48000, # The sampling rate to calculate evaluation metrics. 
-                    setting_fft = {
-                        "cutoff_freq": [24000], # The cutoff frequency of the input x in the 'infer' function
-                    }, 
-)
-# Perform evaluation
-helper.evaluate()
+
+def test():
+    testee = MyTestee()
+    # Initialize a evaluation helper
+    helper = SSR_Eval_Helper(
+        testee,
+        test_name="unprocessed",  # Test name for storing the result
+        input_sr=44100,  # The sampling rate of the input x in the 'infer' function
+        output_sr=44100,  # The sampling rate of the output x in the 'infer' function
+        evaluation_sr=48000,  # The sampling rate to calculate evaluation metrics.
+        setting_fft={
+            "cutoff_freq": [
+                12000
+            ],  # The cutoff frequency of the input x in the 'infer' function
+        },
+        save_processed_result=True
+    )
+    # Perform evaluation
+    helper.evaluate(limit_test_nums=10, limit_test_speaker=-1)
 ```
 The code will automatically handle stuffs like downloading test sets. The evaluation result will be saved in the ./results directory.
 
@@ -110,7 +138,7 @@ helper = SSR_Eval_Helper(testee, # Your testsee object with 'infer' function imp
 )
 
 helper.evaluate(limit_test_nums=10, # For each speaker, only evaluate on 10 utterances.
-                limit_speaker=-1 # Evaluate on all the speakers. 
+                limit_test_speaker=-1 # Evaluate on all the speakers. 
                 )
 ```
 
