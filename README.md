@@ -35,7 +35,8 @@ test()
     }
 ```
 <hr>
-![sdf](https://github.com/haoheliu/ssr_eval/blob/main/pics/main.png)
+
+![main_idea](https://github.com/haoheliu/ssr_eval/blob/main/pics/main.png)
 
 Below is the code of test()
 
