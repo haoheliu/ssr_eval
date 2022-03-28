@@ -41,5 +41,5 @@ if __name__ == "__main__":
                       save_processed_result=False,
     )
     
-    handler.evaluate(limit_test_nums=10, limit_speaker=-1)
+    handler.evaluate(limit_test_nums=10, limit_test_speaker=-1)
     

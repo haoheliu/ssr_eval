@@ -179,4 +179,4 @@ if __name__ == "__main__":
             },
             save_processed_result=True,
         )
-        helper.evaluate(limit_test_nums=2, limit_speaker=-1)
+        helper.evaluate(limit_test_nums=2, limit_test_speaker=-1)
