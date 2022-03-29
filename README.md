@@ -34,6 +34,14 @@ test()
         }
     }
 ```
+Here we report four metrics: 
+1. Log spectral distance(LSD).
+2. Log scale invariant spectral distance [1] (log-sispec).
+3. Scale invariant spectral distance [1] (sispec).
+4. Structral similarity (SSIM).
+
+:warning: **LSD is the most widely used metric for super-resolution.** And I include another three metrics just in case you need them. 
+
 <hr>
 
 ![main_idea](https://github.com/haoheliu/ssr_eval/blob/main/pics/main.png)
@@ -78,6 +86,8 @@ def test():
         save_processed_result=True
     )
     # Perform evaluation
+    ## Use all eight speakers in the test set for evaluation (limit_test_speaker=-1) 
+    ## Evaluate on 10 utterance for each speaker (limit_test_nums=10)
     helper.evaluate(limit_test_nums=10, limit_test_speaker=-1)
 ```
 The code will automatically handle stuffs like downloading test sets. The evaluation result will be saved in the ./results directory.
@@ -143,8 +153,10 @@ helper.evaluate(limit_test_nums=10, # For each speaker, only evaluate on 10 utte
                 limit_test_speaker=-1 # Evaluate on all the speakers. 
                 )
 ```
-
-I recommand all the users to use 'setting_fft' to perform the evaluation for the convinence of comparing between different system.
+:warning:
+<b>
+I recommand all the users to use fourier method (setting_fft) to simulate low-resolution effect for the convinence of comparing between different system.
+</b>
 
 ## Dataset Details
 We build the test sets using VCTK (version 0.92), a multi-speaker English corpus that contains 110 speakers with different accents. 
@@ -154,4 +166,19 @@ We build the test sets using VCTK (version 0.92), a multi-speaker English corpus
 
 ## Citation
 
-Comming soon
+If you find this repo useful for your research, please consider citing:
+
+```bibtex
+@misc{liu2022neural,
+      title={Neural Vocoder is All You Need for Speech Super-resolution}, 
+      author={Haohe Liu and Woosung Choi and Xubo Liu and Qiuqiang Kong and Qiao Tian and DeLiang Wang},
+      year={2022},
+      eprint={2203.14941},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS}
+}
+```
+
+## Reference 
+
+> [1] Liu, Haohe, et al. "VoiceFixer: Toward General Speech Restoration with Neural Vocoder." arXiv preprint arXiv:2109.13731 (2021).
