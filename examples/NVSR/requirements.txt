@@ -1,3 +1,4 @@
 ssr_eval
 voicefixer==0.0.17
 torchlibrosa==0.0.7
+pytorch-lightning>=1.5.0
