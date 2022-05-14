@@ -1,4 +1,4 @@
-# NVSR
+# NVSR (2kHz~44.1kHz to 44.1kHz Super-resolution)
 
 To run our pretrained NVSR. First please install the following requirements.
 
