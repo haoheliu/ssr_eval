@@ -6,6 +6,12 @@
 
 I build this repo while I'm writing my paper for INTERSPEECH 2022: <i>Neural Vocoder is All You Need for Speech Super-resolution</i>. The model mentioned in this paper, NVSR, will also be open-sourced here.
 
+## Some notes
+1. Suggestions for comparing your model with NVSR.
+- At a sampling-rate <= 44.1 kHz. You can resample NVSR result to this sampling-rate.
+- At a sampling-rate > 44.1 kHz (usually 48kHz).     
+First option is resampling your result to 44.1kHz. Another option is train a 48kHz NVSR, which I'm currently working on. I'll release the 48kHz NVSR in the next month.
+
 ## Installation  
 Install via pip:
 ```shell
